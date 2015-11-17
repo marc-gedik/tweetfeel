@@ -9,3 +9,5 @@ Sous Ubuntu :
 sudo pip install -U nltk
 sudo pip install -U textblob
 sudo python -m textblob.download_corpora
+
+Cet analyseur fonctionne pour l'anglais.

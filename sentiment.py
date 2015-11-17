@@ -37,7 +37,8 @@ class Sentiment():
 		for a_sentence in analyzed_sentences :
 			if a_sentence[1] == 'pos':
 				positives += 1
-			elif a_sentence[1] == 'neg':
+			else :
+				#if a_sentence[1] == 'neg'
 				negatives += 1
 		return positives , negatives
 
@@ -46,8 +47,10 @@ class Sentiment():
 			(pourcentage_phrases_positives , pourcentage_phrases_négatives) '''
 
 		nombre_pos_neg = self.nb_pos_neg(sentences)
-		nb_total = nombre_pos_neg[0] + nombre_pos_neg[1]
-		return nombre_pos_neg[0]/nb_total , nombre_pos_neg[1]/nb_total
+		nb_pos = nombre_pos_neg[0]
+		nb_neg = nombre_pos_neg[1]
+		nb_total = nb_pos + nb_neg
+		return (nb_pos/float(nb_total))*100. , nb_neg/float(nb_total)*100.
 
 
 
