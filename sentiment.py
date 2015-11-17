@@ -5,7 +5,7 @@ from textblob import TextBlob
 from textblob import Blobber
 from textblob.sentiments import NaiveBayesAnalyzer
 
-class Sentiments():
+class Sentiment():
 
 	def __init__(self):
 		''' constructeur '''
