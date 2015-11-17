@@ -1,0 +1,11 @@
+
+@mohedia
+
+La classe 'Analyzer' qui se charge de l'analyse de sentiment utilise la librairie python 'Textblob' (https://textblob.readthedocs.org/en/dev/).
+L'ajout de Textblob à python nécessite l'installation de certains paquets. 
+
+Sous Ubuntu : 
+
+sudo pip install -U nltk
+sudo pip install -U textblob
+sudo python -m textblob.download_corpora
