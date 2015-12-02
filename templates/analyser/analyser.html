@@ -1,0 +1,63 @@
+
+
+{% extends 'base.html' %}
+
+{% block title %}{{ category_name }}{% endblock %}
+
+{% block body_block %}
+    <div class="container">
+        <div class="page-header">
+            <h1 class="header">Analyser</h1>
+        </div>
+
+        <nav class="bottom15">
+            <div class="nav-wrapper">
+                <form action="/analyser" method="get">
+                    <div class="input-field">
+                        <input id="search" type="search" name="search" value="{{ search }}" required>
+                        <label for="search"><i class="material-icons">search</i></label>
+                        <i class="material-icons">close</i>
+                    </div>
+                </form>
+            </div>
+        </nav>
+        {{ sentiment }}
+        <div id="piechart" style="width: 960px; height: 500px;"></div>
+
+        {% for tweet in tweets %}
+            <div class="card">
+                <div class="card-content">
+                    <p>{{ tweet }}</p>
+                </div>
+            </div>
+
+        {% endfor %}
+    </div>
+
+
+
+    <script type="text/javascript"
+            src="https://www.google.com/jsapi?autoload={'modules':[{'name':'visualization','version':'1.1','packages':['corechart']}]}"></script>
+    <script>
+        google.setOnLoadCallback(drawChart);
+        function drawChart() {
+
+            var data = google.visualization.arrayToDataTable([
+                ['Sentiment', 'Analyze'],
+                ['Positive', {{ pos }}],
+                ['Negative', {{ neg }}],
+            ]);
+
+            var options = {
+                slices: {
+                    0: {color: '#9DD5C0'},
+                    1: {color: '#F1646C'}
+                }
+            };
+
+            var chart = new google.visualization.PieChart(document.getElementById('piechart'));
+
+            chart.draw(data, options);
+        }
+    </script>
+{% endblock %}
