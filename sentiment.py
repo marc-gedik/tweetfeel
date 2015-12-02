@@ -4,14 +4,20 @@
 from textblob import TextBlob
 from textblob import Blobber
 from textblob.sentiments import NaiveBayesAnalyzer
+from textblob_fr import PatternTagger, PatternAnalyzer
+from sentiment_lang import *
 
 class Sentiment():
 
-	def __init__(self):
+	def __init__(self , lang):
 		''' constructeur '''
 		# créé des objet de type Textblob en 
 		# se servant de l'analyseur passé en argument 
-		self.tb = Blobber(analyzer=NaiveBayesAnalyzer())
+		self.lang = lang
+		if self.lang == Lang.EN :
+			self.tb = Blobber(analyzer=NaiveBayesAnalyzer())
+		elif self.lang == Lang.FR :
+			self.tb = Blobber(pos_tagger=PatternTagger(), analyzer=PatternAnalyzer())
 
 	def pos_or_neg_one(self , sentence):
 		''' prend en argument une phrase propre et dit si elle est négative ou
