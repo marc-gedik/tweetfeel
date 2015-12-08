@@ -1,3 +1,5 @@
+# -*- coding: utf-8 -*-
+
 from django.shortcuts import render
 
 from sentiment import Sentiment
@@ -5,22 +7,23 @@ import tweetCleaner
 from form import SearchForm
 import tweetsearch
 
-# -*- coding: utf-8 -*-
 
 # Create your views here.
 def home(request):
-    return render(request, 'analyser/analyser.html', {'date': 12})
+    return render(request, 'analyser/analyser.html')
 
 
 def analyze(request):
     form = SearchForm(request.GET)
-    print(form)
     if form.is_valid():
         search = form.cleaned_data['search']
 
         tweets = tweetsearch.search(search)
-        cleanedTweets = tweetCleaner.cleanTweets(tweets)
-        pos, neg = Sentiment().percentage_pos_neg(cleanedTweets)
+        tweetCleaner.cleanTweets(tweets)
+        pos, neg, neutre = Sentiment().percentage_pos_neg(tweets)
+        tweets.sort(lambda x, y: int(( y.sentiment - x.sentiment)*100))
 
-        return render(request, 'analyser/analyser.html', {"search": search, "pos": pos, "neg": neg, "tweets": tweets})
+        return render(request, 'analyser/analyser.html',
+                      {"search": search, "pos": pos, "neg": neg, "neutre": neutre, "tweets": tweets})
     return render(request, 'analyser/analyser.html')
+

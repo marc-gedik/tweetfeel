@@ -1,7 +1,9 @@
 #!/usr/bin/env python
+# -*- coding: utf-8 -*-
+
 
 import tweepy
-
+from Tweet import Tweet
 
 
 def search(text):
@@ -19,5 +21,5 @@ def search(text):
     # Construct the API instance
     api = tweepy.API(auth)
 
-    return [tweet.text for tweet in api.search(text, count=100, lang="en")]
+    return list(set([Tweet(tweet.text) for tweet in api.search(text, count=100, lang="en")]))
 

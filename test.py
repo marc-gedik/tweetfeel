@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 
 from sentiment import Sentiment
-from sentiment_lang import *
+from utils import *
 
 S = Sentiment(Lang.EN)
 
