@@ -3,6 +3,7 @@
 
 import string
 import re
+from nltk.corpus import stopwords
 
 emoji_pos = ["😄", "😃", "😀", "😊", "☺", "😉", "😍", "😘", "😚", "😗", "😙", "😜", "😝", "😛", "😳", "😁", "😂", "😆",
              "😋", "😎", "😺", "😸", "😻", "😽", "💃", "👏", "👍", "👌", "👊", "👐", "✌", "🌞", "☀", "🔆", "🔅" "💡",
@@ -57,6 +58,26 @@ def cleanTweet(tweet):
 
     return tweet
 
+
 def cleanTweets(tweets):
     for tweet in tweets:
         tweet.cleaned = cleanTweet(tweet.tweet)
+
+
+def cleanBanalWords(allTweets):
+    allTweets = re.sub(r'[0-9]', '', allTweets)
+    allTweets = re.sub('RT', '', allTweets)
+
+    allTweets = allTweets.lower()
+    allTweets= ''.join([l for l in allTweets if l not in string.punctuation])
+    allTweets= ' '.join([l for l in allTweets.split(" ") if l not in stopwords.words('french')])
+
+    return allTweets
+
+
+
+
+
+print cleanBanalWords("lire c'est refuser la chose qui a une des que mdr a a  qui  ai est")
+
+
