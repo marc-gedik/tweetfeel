@@ -3,6 +3,8 @@
 
 import string
 import re
+from Tweet import Tweet
+import nltk
 from nltk.corpus import stopwords
 
 emoji_pos = ["😄", "😃", "😀", "😊", "☺", "😉", "😍", "😘", "😚", "😗", "😙", "😜", "😝", "😛", "😳", "😁", "😂", "😆",
@@ -66,18 +68,34 @@ def cleanTweets(tweets):
 
 def cleanBanalWords(allTweets):
     allTweets = re.sub(r'[0-9]', '', allTweets)
-    allTweets = re.sub('RT', '', allTweets)
 
     allTweets = allTweets.lower()
+    allTweets = re.sub('rt', '', allTweets)
+    allTweets = re.sub('at_user', '', allTweets)
+    allTweets = re.sub('url', '', allTweets)
+
     allTweets= ''.join([l for l in allTweets if l not in string.punctuation])
-    allTweets= ' '.join([l for l in allTweets.split(" ") if l not in stopwords.words('french')])
-
-    return allTweets
+    allTweets= ' '.join([l for l in allTweets.split(" ") if l not in stopwords.words('english')])
 
 
 
+    return allTweets.strip()
 
 
-print cleanBanalWords("lire c'est refuser la chose qui a une des que mdr a a  qui  ai est")
+def listFrequenceWord(listAllTweets):
 
+    allTweets = [cleanBanalWords(textTweet.cleaned) for textTweet in listAllTweets]
+    
+    
+    allTweets = " ".join(allTweets)
+    
+    allTweets=allTweets.split(" ")
+    
+    listFrequence = nltk.FreqDist(allTweets)
+    
+    return [Frequency(s,f) for (s,f) in listFrequence.most_common(100)]
 
+class Frequency:
+    def __init__(self, word, frequency):
+        self.word = word
+        self.frequency = frequency * 2

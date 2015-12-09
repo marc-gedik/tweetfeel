@@ -23,6 +23,8 @@
     </nav>
     {{ sentiment }}
     <div id="piechart" style="width: 960px; height: 500px;"></div>
+    <div id="cloud" style="width: 960px; height: 500px;"></div> 
+
     {% for tweet in tweets %}
         <div class="card">
         {% if tweet.sentiment > 0 %}
@@ -35,16 +37,29 @@
     <p>{{ tweet.tweet }}</p>
     </div>
     </div>
-
     {% endfor %}
+
 </div>
-
-
-
+<script type="text/javascript"
+    src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.0.0-alpha1/jquery.min.js">
+    </script>
     <script type="text/javascript"
-            src="https://www.google.com/jsapi?autoload={'modules':[{'name':'visualization','version':'1.1','packages':['corechart']}]}"></script>
+    src="https://cdnjs.cloudflare.com/ajax/libs/jqcloud/1.0.4/jqcloud-1.0.4.min.js">
+    </script>
+    
+    <script type="text/javascript"
+    src="https://www.google.com/jsapi?autoload={'modules':[{'name':'visualization','version':'1.1','packages':['corechart']}]}"></script>
     <script type="text/javascript" src="https://www.google.com/jsapi"></script>
     <script type="text/javascript">
+    
+    var words = [
+    {% for frequency in wordFrequencie %}
+    {text: "{{frequency.word}}", weight: "{{frequency.frequency}}" },
+    {% endfor %}
+    ];
+
+    $('#cloud').jQCloud(words);
+
         google.setOnLoadCallback(drawChart);
         function drawChart() {
 
