@@ -1,7 +1,8 @@
 # -*- coding: utf-8 -*-
 
 class Tweet:
-    def __init__(self, tweet):
+    def __init__(self, id, tweet):
+        self.id = id
         self.tweet = tweet
         self.cleaned = ""
         self.sentiment = 0
@@ -11,6 +12,13 @@ class Tweet:
             return self.tweet == other.tweet
         else:
             return False
+
+    def serialize(self):
+        return {
+            'tweet': self.tweet,
+            'degree': self.degree,
+            'sentiment': self.sentiment
+        }
 
     @property
     def degree(self):

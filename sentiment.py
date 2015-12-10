@@ -64,7 +64,4 @@ class Sentiment():
 
         nombre_pos_neg = self.nb_pos_neg(tweets)
         nb_pos, nb_neg, nb_neutre = nombre_pos_neg
-        nb_total = nb_pos + nb_neg + nb_neutre
-        return nb_pos / float(nb_total) * 100., \
-               nb_neg / float(nb_total) * 100., \
-               nb_neutre / float(nb_total) * 100.
+        return nb_pos, nb_neg, nb_neutre

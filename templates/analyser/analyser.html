@@ -1,18 +1,17 @@
-
-
 {% extends 'base.html' %}
+{% load staticfiles %}
 
 {% block title %}{{ category_name }}{% endblock %}
 
 {% block body_block %}
-    <div class="container">
+<div class="container">
     <div class="page-header">
         <h1 class="header">Analyser</h1>
     </div>
 
     <nav class="bottom15">
         <div class="nav-wrapper">
-            <form action="/analyser" method="get">
+            <form id="searchForm" action="/analyser" method="get">
                 <div class="input-field">
                     <input id="search" type="search" name="search" value="{{ search }}" required>
                     <label for="search"><i class="material-icons">search</i></label>
@@ -23,37 +22,37 @@
     </nav>
     {{ sentiment }}
     <div id="piechart" style="width: 960px; height: 500px;"></div>
-    {% for tweet in tweets %}
-        <div class="card">
-        {% if tweet.sentiment > 0 %}
-            <div class="card-content green lighten-{{ tweet.degree }}">
-        {% elif tweet.sentiment < 0 %}
-            <div class="card-content red lighten-{{ tweet.degree }}">
-        {% else %}
-            <div class="card-content">
-        {% endif %}
-    <p>{{ tweet.tweet }}</p>
-    </div>
-    </div>
 
-    {% endfor %}
+    <div class="row">
+        <div id="tweets" class="col s12">
+
+        </div>
+    </div>
 </div>
 
 
+{% endblock %}
 
+{% block js_block %}
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
+    <script type="text/javascript" src="{% static 'twitterScrapper.js' %}"></script>
     <script type="text/javascript"
             src="https://www.google.com/jsapi?autoload={'modules':[{'name':'visualization','version':'1.1','packages':['corechart']}]}"></script>
-    <script type="text/javascript" src="https://www.google.com/jsapi"></script>
     <script type="text/javascript">
-        google.setOnLoadCallback(drawChart);
+
+        var pieChartData = []
+        function resetPieChartData() {
+            pieChartData = [
+                ['Sentiment', 'Analyze'],
+                ['Positive', 0],
+                ['Negative', 0],
+                ['Neutre', 0]
+            ]
+        }
+
         function drawChart() {
 
-            var data = google.visualization.arrayToDataTable([
-                ['Sentiment', 'Analyze'],
-                ['Positive', {{ pos }}],
-                ['Negative', {{ neg }}],
-                ['Neutre', {{ neutre }}]
-            ]);
+            var data = google.visualization.arrayToDataTable(pieChartData);
 
             var options = {
                 slices: {
@@ -62,41 +61,63 @@
                     2: {color: '#F4F4F4'}
                 }
             };
-
             var chart = new google.visualization.PieChart(document.getElementById('piechart'));
-
             chart.draw(data, options);
         }
 
-        google.load("visualization", "1", {packages: ["geochart"]});
-        google.setOnLoadCallback(drawRegionsMap);
-
-       function drawMarkersMap() {
-      var data = google.visualization.arrayToDataTable([
-        ['City',   'Population', 'Area'],
-        ['Rome',      2761477,    1285.31],
-        ['Milan',     1324110,    181.76],
-        ['Naples',    959574,     117.27],
-        ['Turin',     907563,     130.17],
-        ['Palermo',   655875,     158.9],
-        ['Genoa',     607906,     243.60],
-        ['Bologna',   380181,     140.7],
-        ['Florence',  371282,     102.41],
-        ['Fiumicino', 67370,      213.44],
-        ['Anzio',     52192,      43.43],
-        ['Ciampino',  38262,      11]
-      ]);
-
-      var options = {
-        region: 'IT',
-        displayMode: 'markers',
-        colorAxis: {colors: ['green', 'blue']}
-      };
-
-      var chart = new google.visualization.GeoChart(document.getElementById('chart_div'));
-      chart.draw(data, options);
-
+        function addTweet(text, sentiment, degree) {
+            if (sentiment > 0)
+                div = '<div class="card-content green lighten-' + degree + '">'
+            else if (sentiment < 0)
+                div = '<div class="card-content red lighten-' + degree + '">'
+            else
+                div = '<div class="card-content">'
+            $("#tweets").append('<div class="card">' + div + text + "</div></div>")
         }
+
+        function addTweets(tweets){
+            tweets.forEach(function (tweet) {
+                addTweet(tweet.tweet, tweet.sentiment, tweet.degree)
+            });
+        }
+
+        var intervalId
+        var minTweet = 0
+        var maxTweet = 0
+
+        $(document).ready(function () {
+            $("form").submit(function (event) {
+                resetPieChartData();
+
+                var $this = $(this);
+                event.preventDefault();
+                clearInterval(intervalId);
+                intervalId = setInterval(function () {
+                    $.ajax({
+                        url: $this.attr('action'),
+                        type: $this.attr('method'),
+                        data: 'search=' + $('#search').val()
+                        + '&min=' + minTweet
+                        + '&max=' + maxTweet,
+                        success: function (data) {
+                            pieChartData[1][1] += data.pos
+                            pieChartData[2][1] += data.neg
+                            pieChartData[3][1] += data.neutre
+                            drawChart()
+
+                            minTweet = data.min
+                            maxTweet = data.max
+
+                            addTweets(data.tweets)
+                        },
+                        error: function () {
+                            clearInterval(intervalId);
+                        }
+                    });
+                    console.log(intervalId)
+                }, 1000 * .5);
+            })
+        });
 
     </script>
 {% endblock %}

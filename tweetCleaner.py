@@ -73,11 +73,3 @@ def cleanBanalWords(allTweets):
     allTweets= ' '.join([l for l in allTweets.split(" ") if l not in stopwords.words('french')])
 
     return allTweets
-
-
-
-
-
-print cleanBanalWords("lire c'est refuser la chose qui a une des que mdr a a  qui  ai est")
-
-

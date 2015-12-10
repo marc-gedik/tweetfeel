@@ -17,7 +17,7 @@ from django.conf.urls import patterns, url
 from django.contrib import admin
 
 urlpatterns = patterns('analyser.views',
-    url(r'^$', 'home'),
+    url(r'^$', 'index'),
     url(r'analyser$', 'analyze'),
 
 )
