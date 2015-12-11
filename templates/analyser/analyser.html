@@ -4,60 +4,54 @@
 {% block title %}{{ category_name }}{% endblock %}
 
 {% block body_block %}
-<div class="container">
-    <div class="page-header">
-        <h1 class="header">Analyser</h1>
-    </div>
-
-    <nav class="bottom15">
-        <div class="nav-wrapper">
-            <form id="searchForm" action="/analyser" method="get">
-                <div class="input-field">
-                    <input id="search" type="search" name="search" value="{{ search }}" required>
-                    <label for="search"><i class="material-icons">search</i></label>
-                    <i class="material-icons">close</i>
-                </div>
-            </form>
+    <div class="container">
+        <div class="page-header">
+            <h1 class="header">Analyser</h1>
         </div>
-    </nav>
-    {{ sentiment }}
-    <div id="piechart" style="width: 960px; height: 500px;"></div>
 
-    <div class="row">
-        <div id="tweets" class="col s12">
+        <nav class="bottom15">
+            <div class="nav-wrapper">
+                <form id="searchForm" action="/analyser" method="get">
+                    <div class="input-field">
+                        <input id="search" type="search" name="search" value="{{ search }}" required>
+                        <label for="search"><i class="material-icons">search</i></label>
+                        <i class="material-icons">close</i>
+                    </div>
+                </form>
+            </div>
+        </nav>
+        {{ sentiment }}
+        <div id="piechart" style="width: 960px; height: 500px;"></div>
+        <div id="cloud"></div>
+        <div class="row">
+            <div id="tweets" class="col s12">
 
+            </div>
         </div>
     </div>
-</div>
 
 
 {% endblock %}
 
 {% block js_block %}
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
-    <script type="text/javascript" src="{% static 'twitterScrapper.js' %}"></script>
+    <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jqcloud/1.0.4/jqcloud-1.0.4.min.js"></script>
     <script type="text/javascript"
             src="https://www.google.com/jsapi?autoload={'modules':[{'name':'visualization','version':'1.1','packages':['corechart']}]}"></script>
-    src="https://cdnjs.cloudflare.com/ajax/libs/jqcloud/1.0.4/jqcloud-1.0.4.min.js">
-    </script>
-    
-    <script type="text/javascript"
-    src="https://www.google.com/jsapi?autoload={'modules':[{'name':'visualization','version':'1.1','packages':['corechart']}]}"></script>
-    <script type="text/javascript" src="https://www.google.com/jsapi"></script>
-    <script type="text/javascript">
-    
-    var words = [
-    {% for frequency in wordFrequencie %}
-    {text: "{{frequency.word}}", weight: "{{frequency.frequency}}" },
-    {% endfor %}
-    ];
 
-    $('#cloud').jQCloud(words);
+    <script>
+        var words = [
+            {% for frequency in wordFrequencie %}
+                {text: "{{ frequency.word }}", weight: "{{ frequency.frequency }}"},
+            {% endfor %}
+        ];
+
+        $('#cloud').jQCloud(words);
 
         google.setOnLoadCallback(drawChart);
-        function drawChart() {
 
-        var pieChartData = []
+        var pieChartData = resetPieChartData()
+
         function resetPieChartData() {
             pieChartData = [
                 ['Sentiment', 'Analyze'],
@@ -84,15 +78,15 @@
 
         function addTweet(text, sentiment, degree) {
             if (sentiment > 0)
-                div = '<div class="card-content green lighten-' + degree + '">'
+                div = '<div class= "card-content green lighten-' + degree + '">'
             else if (sentiment < 0)
-                div = '<div class="card-content red lighten-' + degree + '">'
+                div = '<div class= "card-content red lighten-' + degree + '">'
             else
-                div = '<div class="card-content">'
-            $("#tweets").append('<div class="card">' + div + text + "</div></div>")
+                div = '<div class= "card-content"> '
+            $("#tweets").append('<div class="card"> ' + div + text + '</div></div>')
         }
 
-        function addTweets(tweets){
+        function addTweets(tweets) {
             tweets.forEach(function (tweet) {
                 addTweet(tweet.tweet, tweet.sentiment, tweet.degree)
             });
@@ -105,7 +99,7 @@
         $(document).ready(function () {
             $("form").submit(function (event) {
                 resetPieChartData();
-
+                $("#tweets").empty()
                 var $this = $(this);
                 event.preventDefault();
                 clearInterval(intervalId);
@@ -117,15 +111,18 @@
                         + '&min=' + minTweet
                         + '&max=' + maxTweet,
                         success: function (data) {
-                            pieChartData[1][1] += data.pos
-                            pieChartData[2][1] += data.neg
-                            pieChartData[3][1] += data.neutre
-                            drawChart()
+                            if(data.search == $("#search").val()) {
 
-                            minTweet = data.min
-                            maxTweet = data.max
+                                pieChartData[1][1] += data.pos
+                                pieChartData[2][1] += data.neg
+                                pieChartData[3][1] += data.neutre
+                                drawChart()
 
-                            addTweets(data.tweets)
+                                minTweet = data.min
+                                maxTweet = data.max
+
+                                addTweets(data.tweets)
+                            }
                         },
                         error: function () {
                             clearInterval(intervalId);

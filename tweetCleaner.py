@@ -22,11 +22,13 @@ emoticone_pos = [":-)", ":)", "=)", "(:", "X)", "x)", "(x", "X)", "x)", "(x", ":
 emoticone_neg = [":-(", ":(", "=(", "):-\|", ":\|", "=\|", "\|:", ":-/", ":/", "=/", "/:", ":'-(", ":'(", "='(" "*-*",
                  "¦~(", "D:", "DX", "D=", ":-@", ":@", ">:-(", ">:(", "=@", ">=("]
 
+
 def formatEmoticone(chaine_emoticone):
     chaine = "|".join(chaine_emoticone)
     chaine = chaine.replace('(', "\\(")
     chaine = chaine.replace(')', "\\)")
     return chaine
+
 
 formatedPos = formatEmoticone(emoticone_pos) + formatEmoticone(emoji_pos)
 formatedNeg = formatEmoticone(emoticone_neg) + formatEmoticone(emoji_neg)
@@ -40,17 +42,17 @@ def applyOnTweet(tweet, formatted_string, replaceBy):
 
 
 def cleanTweet(tweet):
-    #Convert to lower case
+    # Convert to lower case
     tweet = tweet.lower()
-    #Convert www.* or https?://* to URL
-    tweet = re.sub('((www\.[^\s]+)|(https?://[^\s]+))','URL',tweet)
-    #Convert @username to AT_USER
-    tweet = re.sub('@[^\s]+','AT_USER',tweet)
-    #Remove additional white spaces
+    # Convert www.* or https?://* to URL
+    tweet = re.sub('((www\.[^\s]+)|(https?://[^\s]+))', 'URL', tweet)
+    # Convert @username to AT_USER
+    tweet = re.sub('@[^\s]+', 'AT_USER', tweet)
+    # Remove additional white spaces
     tweet = re.sub('[\s]+', ' ', tweet)
-    #Replace #word with word
+    # Replace #word with word
     tweet = re.sub(r'#([^\s]+)', r'\1', tweet)
-    #trim
+    # trim
     tweet = tweet.strip('\'"')
 
     formatted_emoticone_pos = formatedPos
@@ -74,28 +76,31 @@ def cleanBanalWords(allTweets):
     allTweets = re.sub('at_user', '', allTweets)
     allTweets = re.sub('url', '', allTweets)
 
-    allTweets= ''.join([l for l in allTweets if l not in string.punctuation])
-    allTweets= ' '.join([l for l in allTweets.split(" ") if l not in stopwords.words('english')])
-
-
+    allTweets = ''.join([l for l in allTweets if l not in string.punctuation])
+    allTweets = ' '.join([l for l in allTweets.split(" ") if l not in stopwords.words('english')])
 
     return allTweets.strip()
 
 
 def listFrequenceWord(listAllTweets):
-
     allTweets = [cleanBanalWords(textTweet.cleaned) for textTweet in listAllTweets]
-    
-    
+
     allTweets = " ".join(allTweets)
-    
-    allTweets=allTweets.split(" ")
-    
+
+    allTweets = allTweets.split(" ")
+
     listFrequence = nltk.FreqDist(allTweets)
-    
-    return [Frequency(s,f) for (s,f) in listFrequence.most_common(100)]
+
+    return [Frequency(s, f).serialize() for (s, f) in listFrequence.most_common(100)]
+
 
 class Frequency:
     def __init__(self, word, frequency):
         self.word = word
-        self.frequency = frequency * 2
+        self.frequency = frequency
+
+    def serialize(self):
+        return {
+            "text": self.word,
+            "weight": self.frequency
+        }

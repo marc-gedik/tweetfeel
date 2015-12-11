@@ -30,27 +30,25 @@ def analyze(request):
 
         tweets = tweetsearch.scrap(search, min, max)
         tweetCleaner.cleanTweets(tweets)
+        wordFrequencie = tweetCleaner.listFrequenceWord(tweets)
 
         pos, neg, neutre = Sentiment().percentage_pos_neg(tweets)
-        if(min == 0):
+        if (min == 0):
             min = tweets[0].id
         max = tweets[len(tweets) - 1].id
+
         tweets = [tweet.serialize() for tweet in tweets]
 
-        ## tweets.sort(lambda x, y: int(( y.sentiment - x.sentiment)*100))
-        wordFrequencie = tweetCleaner.listFrequenceWord(tweets)
-        return render(request, 'analyser/analyser.html',
-                      {"search": search, "pos": pos, "neg": neg, "neutre": neutre, "tweets": tweets, "wordFrequencie": wordFrequencie})
-    return render(request, 'analyser/analyser.html')
-
         return JsonResponse(
-            {"pos": pos,
-             "neg": neg,
-             "neutre": neutre,
-             "tweets": tweets,
-             "min": min,
-             "max": max
-             }
+            {
+                "search": search,
+                "pos": pos,
+                "neg": neg,
+                "neutre": neutre,
+                "tweets": tweets,
+                "min": min,
+                "max": max,
+                "wordFrequencie": wordFrequencie
+            }
         )
-    print("---Non--")
     return HttpResponse('')
