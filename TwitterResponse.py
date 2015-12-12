@@ -17,9 +17,10 @@ class TwitterResponse(object):
         parsed_html = BeautifulSoup(html, "html.parser")
         for element in parsed_html.select("li.js-stream-item"):
             id = element['data-item-id']
-            text = element.select("p.tweet-text")[0].get_text()
-            tweets += [Tweet(id, text)]
-        print(tweets)
+            textP = element.select("p.tweet-text")
+            if(len(textP) > 0):
+                text = textP[0].get_text()
+                tweets += [Tweet(id, text)]
         return tweets
 
 def as_person(json):

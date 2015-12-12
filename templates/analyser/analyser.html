@@ -1,6 +1,9 @@
 {% extends 'base.html' %}
 {% load staticfiles %}
 
+{% block css %}
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/flag-icon-css/0.8.5/css/flag-icon.min.css">
+{% endblock %}
 {% block title %}{{ category_name }}{% endblock %}
 
 {% block body_block %}
@@ -20,9 +23,18 @@
                 </form>
             </div>
         </nav>
-        {{ sentiment }}
-        <div id="piechart" style="width: 960px; height: 500px;"></div>
-        <div id="cloud"></div>
+        <div id="fetch" class="progress" style="display: none;">
+            <div class="indeterminate"></div>
+        </div>
+        <div class="row">
+            <div class="col s12" id="piechart" style="height: 500px;"></div>
+        </div>
+        <div class="row">
+            <div class="col s6" id="positivesChart"></div>
+            <div class="col s6" id="negativesChart"></div>
+        </div>
+        <div id="cloud" style="width: 960px; height: 500px;"></div>
+
         <div class="row">
             <div id="tweets" class="col s12">
 
@@ -34,104 +46,11 @@
 {% endblock %}
 
 {% block js_block %}
-    <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
-    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jqcloud/1.0.4/jqcloud-1.0.4.min.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jqcloud/1.0.4/jqcloud-1.0.4.min.js">
+    </script>
     <script type="text/javascript"
-            src="https://www.google.com/jsapi?autoload={'modules':[{'name':'visualization','version':'1.1','packages':['corechart']}]}"></script>
-
-    <script>
-        var words = [
-            {% for frequency in wordFrequencie %}
-                {text: "{{ frequency.word }}", weight: "{{ frequency.frequency }}"},
-            {% endfor %}
-        ];
-
-        $('#cloud').jQCloud(words);
-
-        google.setOnLoadCallback(drawChart);
-
-        var pieChartData = resetPieChartData()
-
-        function resetPieChartData() {
-            pieChartData = [
-                ['Sentiment', 'Analyze'],
-                ['Positive', 0],
-                ['Negative', 0],
-                ['Neutre', 0]
-            ]
-        }
-
-        function drawChart() {
-
-            var data = google.visualization.arrayToDataTable(pieChartData);
-
-            var options = {
-                slices: {
-                    0: {color: '#9DD5C0'},
-                    1: {color: '#F1646C'},
-                    2: {color: '#F4F4F4'}
-                }
-            };
-            var chart = new google.visualization.PieChart(document.getElementById('piechart'));
-            chart.draw(data, options);
-        }
-
-        function addTweet(text, sentiment, degree) {
-            if (sentiment > 0)
-                div = '<div class= "card-content green lighten-' + degree + '">'
-            else if (sentiment < 0)
-                div = '<div class= "card-content red lighten-' + degree + '">'
-            else
-                div = '<div class= "card-content"> '
-            $("#tweets").append('<div class="card"> ' + div + text + '</div></div>')
-        }
-
-        function addTweets(tweets) {
-            tweets.forEach(function (tweet) {
-                addTweet(tweet.tweet, tweet.sentiment, tweet.degree)
-            });
-        }
-
-        var intervalId
-        var minTweet = 0
-        var maxTweet = 0
-
-        $(document).ready(function () {
-            $("form").submit(function (event) {
-                resetPieChartData();
-                $("#tweets").empty()
-                var $this = $(this);
-                event.preventDefault();
-                clearInterval(intervalId);
-                intervalId = setInterval(function () {
-                    $.ajax({
-                        url: $this.attr('action'),
-                        type: $this.attr('method'),
-                        data: 'search=' + $('#search').val()
-                        + '&min=' + minTweet
-                        + '&max=' + maxTweet,
-                        success: function (data) {
-                            if(data.search == $("#search").val()) {
-
-                                pieChartData[1][1] += data.pos
-                                pieChartData[2][1] += data.neg
-                                pieChartData[3][1] += data.neutre
-                                drawChart()
-
-                                minTweet = data.min
-                                maxTweet = data.max
-
-                                addTweets(data.tweets)
-                            }
-                        },
-                        error: function () {
-                            clearInterval(intervalId);
-                        }
-                    });
-                    console.log(intervalId)
-                }, 1000 * .5);
-            })
-        });
-
+            src="https://www.google.com/jsapi?autoload={'modules':[{'name':'visualization','version':'1.1','packages':['corechart']}]}">
+    </script>
+    <script type="text/javascript" src="{% static 'analyser.js' %}">
     </script>
 {% endblock %}

@@ -1,35 +1,31 @@
 #!usr/bin/pyhton
 # -*- coding: utf-8 -*-
 
-from textblob import TextBlob
-from textblob import Blobber
-from textblob.sentiments import NaiveBayesAnalyzer
-##from textblob_fr import PatternTagger, PatternAnalyzer
-from utils import Sentiment, Lang
+import pattern.en as en
+import pattern.fr as fr
 
 
 class Sentiment():
-    def __init__(self, lang=Lang.EN):
+    def __init__(self, lang="en"):
         """ constructeur """
         # créé des objet de type Textblob en
         # se servant de l'analyseur passé en argument
-        if lang == Lang.EN:
-            self.tb = TextBlob
-            ##      elif lang == Lang.FR:
-
-    ##        self.tb = Blobber(pos_tagger=PatternTagger(), analyzer=PatternAnalyzer())
+        if lang == "en":
+            
+            self.tb = en.sentiment
+        elif lang == "fr":
+            self.tb = fr.sentiment
 
     def pos_or_neg_one(self, tweet):
         """ prend en argument une phrase propre et dit si elle est négative ou
             positive sous la forme d'un couple : (phrase , 'pos'/'neg').
             Exemple : ('je suis beau' , 'pos') """
 
-        blob = self.tb(tweet.cleaned)
-
-        tweet.sentiment = blob.sentiment.polarity
-        if blob.sentiment.polarity > 0:
+        polarity, subjectivity = self.tb(tweet.cleaned)
+        tweet.sentiment = polarity
+        if polarity > 0:
             return 'pos'
-        elif blob.sentiment.polarity == 0:
+        elif polarity == 0:
             return 'neutre'
         else:
             return 'neg'
@@ -57,11 +53,3 @@ class Sentiment():
                 neutre += 1
 
         return positives, negatives, neutre
-
-    def percentage_pos_neg(self, tweets):
-        ''' prend en argument une liste de phrases et retourne un couple
-            (pourcentage_phrases_positives , pourcentage_phrases_négatives) '''
-
-        nombre_pos_neg = self.nb_pos_neg(tweets)
-        nb_pos, nb_neg, nb_neutre = nombre_pos_neg
-        return nb_pos, nb_neg, nb_neutre

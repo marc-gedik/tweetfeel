@@ -27,12 +27,13 @@ def analyze(request):
         search = form.cleaned_data['search']
         min = form.cleaned_data['min']
         max = form.cleaned_data['max']
+        lang = form.cleaned_data['lang']
 
-        tweets = tweetsearch.scrap(search, min, max)
-        tweetCleaner.cleanTweets(tweets)
-        wordFrequencie = tweetCleaner.listFrequenceWord(tweets)
+        tweets = tweetsearch.scrap(search, min, max, lang)
+        tweetCleaner.cleanTweets(tweets, lang)
+        wordFrequencies = tweetCleaner.listFrequenceWord(tweets, lang)
 
-        pos, neg, neutre = Sentiment().percentage_pos_neg(tweets)
+        pos, neg, neutre = Sentiment(lang).nb_pos_neg(tweets)
         if (min == 0):
             min = tweets[0].id
         max = tweets[len(tweets) - 1].id
@@ -48,7 +49,7 @@ def analyze(request):
                 "tweets": tweets,
                 "min": min,
                 "max": max,
-                "wordFrequencie": wordFrequencie
+                "wordFrequencies": wordFrequencies
             }
         )
     return HttpResponse('')

@@ -3,6 +3,11 @@
     font-weight: 300;
 }
 
-.bottom15{
+.headerFlag {
+    font-size: 25px;
+    padding: 0 5px;
+}
+
+.bottom15 {
     margin-bottom: 15px;
 }

@@ -41,7 +41,11 @@ def applyOnTweet(tweet, formatted_string, replaceBy):
     return clean_tweet
 
 
-def cleanTweet(tweet):
+dict = {"en": {"good": "good", "bad": "bad"},
+        "fr": {"good": "bien", "bad": "mauvais"}}
+
+
+def cleanTweet(tweet, lang):
     # Convert to lower case
     tweet = tweet.lower()
     # Convert www.* or https?://* to URL
@@ -56,19 +60,24 @@ def cleanTweet(tweet):
     tweet = tweet.strip('\'"')
 
     formatted_emoticone_pos = formatedPos
-    tweet = applyOnTweet(tweet, formatted_emoticone_pos, "happy")
+    tweet = applyOnTweet(tweet, formatted_emoticone_pos, dict[lang]["good"])
     formatted_emoticone_neg = formatedNeg
-    tweet = applyOnTweet(tweet, formatted_emoticone_neg, "sad")
+    tweet = applyOnTweet(tweet, formatted_emoticone_neg, dict[lang]["bad"])
 
     return tweet
 
 
-def cleanTweets(tweets):
+def cleanTweets(tweets, lang):
     for tweet in tweets:
-        tweet.cleaned = cleanTweet(tweet.tweet)
+        tweet.cleaned = cleanTweet(tweet.tweet, lang)
 
 
-def cleanBanalWords(allTweets):
+def cleanBanalWords(allTweets, lang):
+    if lang == "fr":
+        lang = "french"
+    else:
+        lang = "english"
+
     allTweets = re.sub(r'[0-9]', '', allTweets)
 
     allTweets = allTweets.lower()
@@ -77,13 +86,13 @@ def cleanBanalWords(allTweets):
     allTweets = re.sub('url', '', allTweets)
 
     allTweets = ''.join([l for l in allTweets if l not in string.punctuation])
-    allTweets = ' '.join([l for l in allTweets.split(" ") if l not in stopwords.words('english')])
+    allTweets = ' '.join([l for l in allTweets.split(" ") if l not in stopwords.words(lang)])
 
     return allTweets.strip()
 
 
-def listFrequenceWord(listAllTweets):
-    allTweets = [cleanBanalWords(textTweet.cleaned) for textTweet in listAllTweets]
+def listFrequenceWord(listAllTweets, lang):
+    allTweets = [cleanBanalWords(textTweet.cleaned, lang) for textTweet in listAllTweets]
 
     allTweets = " ".join(allTweets)
 
