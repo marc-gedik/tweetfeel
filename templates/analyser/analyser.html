@@ -9,7 +9,7 @@
 {% block body_block %}
     <div class="container">
         <div class="page-header">
-            <h1 class="header">Analyser</h1>
+            <h4 class="header">Choisissez un mot clé pour lancer une analyse de sentiment</h4>
         </div>
 
         <nav class="bottom15">
@@ -30,11 +30,12 @@
             <div class="col s12" id="piechart" style="height: 500px;"></div>
         </div>
         <div class="row">
-            <div class="col s6" id="positivesChart"></div>
-            <div class="col s6" id="negativesChart"></div>
+            <div class="col s12 m6" id="positivesChart"></div>
+            <div class="col s12 m6" id="negativesChart"></div>
         </div>
-        <div id="cloud" style="width: 960px; height: 500px;"></div>
-
+        <div class="row">
+            <div class="col s12" id="cloud" style="height: 500px;"></div>
+        </div>
         <div class="row">
             <div id="tweets" class="col s12">
 
@@ -51,6 +52,8 @@
     <script type="text/javascript"
             src="https://www.google.com/jsapi?autoload={'modules':[{'name':'visualization','version':'1.1','packages':['corechart']}]}">
     </script>
+    <script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/d3/3.4.11/d3.min.js"></script>
+    <script type="text/javascript" src="https://graphlabapi.googlecode.com/hg-history/3ebb207ae5c49a0bc104148b6490a7c86d16bf2e/apps/twitterrank/http/lib/d3-cloud-master/d3.layout.cloud.js"></script>
     <script type="text/javascript" src="{% static 'analyser.js' %}">
     </script>
 {% endblock %}

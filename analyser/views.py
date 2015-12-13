@@ -31,7 +31,7 @@ def analyze(request):
 
         tweets = tweetsearch.scrap(search, min, max, lang)
         tweetCleaner.cleanTweets(tweets, lang)
-        wordFrequencies = tweetCleaner.listFrequenceWord(tweets, lang)
+        wordFrequencies = tweetCleaner.listFrequenceWord(tweets, search, lang)
 
         pos, neg, neutre = Sentiment(lang).nb_pos_neg(tweets)
         if (min == 0):

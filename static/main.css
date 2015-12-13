@@ -11,3 +11,7 @@
 .bottom15 {
     margin-bottom: 15px;
 }
+
+.card .card-content {
+    overflow: auto;
+}
