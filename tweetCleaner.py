@@ -72,7 +72,7 @@ def cleanTweets(tweets, lang):
         tweet.cleaned = cleanTweet(tweet.tweet, lang)
 
 
-def cleanBanalWords(allTweets, lang):
+def cleanBanalWords(allTweets, search, lang):
     if lang == "fr":
         lang = "french"
     else:
@@ -84,6 +84,7 @@ def cleanBanalWords(allTweets, lang):
     allTweets = re.sub('rt', '', allTweets)
     allTweets = re.sub('at_user', '', allTweets)
     allTweets = re.sub('url', '', allTweets)
+    allTweets = re.sub(search, '', allTweets)
 
     allTweets = ''.join([l for l in allTweets if l not in string.punctuation])
     allTweets = ' '.join([l for l in allTweets.split(" ") if l not in stopwords.words(lang)])
@@ -91,8 +92,8 @@ def cleanBanalWords(allTweets, lang):
     return allTweets.strip()
 
 
-def listFrequenceWord(listAllTweets, lang):
-    allTweets = [cleanBanalWords(textTweet.cleaned, lang) for textTweet in listAllTweets]
+def listFrequenceWord(listAllTweets, search, lang):
+    allTweets = [cleanBanalWords(textTweet.cleaned, search, lang) for textTweet in listAllTweets]
 
     allTweets = " ".join(allTweets)
 
@@ -100,7 +101,7 @@ def listFrequenceWord(listAllTweets, lang):
 
     listFrequence = nltk.FreqDist(allTweets)
 
-    return [Frequency(s, f).serialize() for (s, f) in listFrequence.most_common(100)]
+    return [Frequency(s, f).serialize() for (s, f) in listFrequence.most_common(listFrequence.N())]
 
 
 class Frequency:

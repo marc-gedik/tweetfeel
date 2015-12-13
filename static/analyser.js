@@ -1,6 +1,9 @@
 var words = [];
-console.log(words)
-$('#cloud').jQCloud(words);
+
+setInterval(function () {
+    $("#cloud").empty()
+    $('#cloud').jQCloud(words.slice(0, 100), {delayedMode: false});
+}, 1000 * 10)
 
 var pieChartData
 
@@ -94,11 +97,12 @@ $(document).ready(function () {
         resetPieChartData();
         resetNegativesChart();
         resetPositivesChart();
-
+        words = [];
         $("#tweets").empty();
         var $this = $(this);
         event.preventDefault();
-        clearInterval(intervalId);
+        stop()
+        success = true
         intervalId = setInterval(function () {
 
             if (success) {
@@ -127,28 +131,34 @@ $(document).ready(function () {
 
                             drawPie();
                             drawChart(positivesChart, 'positivesChart');
-                            drawChart(negativesChart, 'negativesChart')
+                            drawChart(negativesChart, 'negativesChart');
+
+                            merge(data.wordFrequencies);
+
                         }
                     },
                     error: function () {
-                        clearInterval(intervalId);
+                        $("#fetch").hide()
+                        stop()
                     }
                 });
             }
         }, 1000 * .5);
-        console.log(intervalId)
     })
 });
 
 function merge(array) {
     for (i = 0; i < words.length; i++)
         for (j = 0; j < array.length; j++)
-            if (words[i].text = array[i].text) {
-                words[i].weight += array[i].weight;
+            if (words[i].text == array[j].text) {
+                words[i].weight += array[j].weight;
                 array.splice(j, 1);
             }
     array.forEach(function (freq) {
         words.push(freq)
+    })
+    words.sort(function (a, b) {
+        return b.weight - a.weight
     })
 }
 
