@@ -150,7 +150,7 @@ $(document).ready(function () {
 function merge(array) {
     for (i = 0; i < words.length; i++)
         for (j = 0; j < array.length; j++)
-            if (words[i].text == array[j].text) {
+            if (words[i].text == array[j].text && words[i].length > 1) {
                 words[i].weight += array[j].weight;
                 array.splice(j, 1);
             }
