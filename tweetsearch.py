@@ -1,36 +1,24 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-from time import sleep
-
-import TwitterResponse
-
 import urllib2
 import urllib
-
 import json
+
+import TwitterResponse
 
 TWITTER_SEARCH_URL = "https://twitter.com/i/search/timeline"
 TYPE_PARAM = "f"
 QUERY_PARAM = "q"
 SCROLL_CURSOR_PARAM = "max_position"
 
+
 def executeSearch(url):
+    '''
+    Execute une requete url (de recherche Twitter)
+    et attend en reponse un objet de type TwitterResponse
+    '''
     serialized_data = urllib2.urlopen(url).read()
-    return json.loads(serialized_data, object_hook=TwitterResponse.as_person)
-
-
-def scrapper(query, rateDelay=1):
-    url = constructURL(query)
-    minTweet = None
-    for i in range(10):
-        response = executeSearch(url)
-        tweets = response.getTweets()
-        if (minTweet == None):
-            minTweet = tweets[0].id
-        maxTweet = tweets[len(tweets) - 1].id
-        sleep(rateDelay)
-        maxPosition = "TWEET-" + maxTweet + "-" + minTweet
-        url = constructURL(query, maxPosition)
+    return json.loads(serialized_data, object_hook=TwitterResponse.as_response)
 
 
 def maxPosition(min, max):
@@ -41,6 +29,9 @@ def maxPosition(min, max):
 
 
 def tweetLang(lang):
+    '''
+    paramametre de la langue Twitter au bon format
+    '''
     return 'lang:' + str(lang) + ' '
 
 
@@ -55,6 +46,9 @@ def scrapMaxPosition(query, maxPosition, lang="en"):
 
 
 def param(key, value):
+    '''
+    Creer un parametre d'url
+    '''
     return str(key) + "=" + str(value)
 
 

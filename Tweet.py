@@ -1,6 +1,15 @@
 # -*- coding: utf-8 -*-
 
 class Tweet:
+    '''
+    Class qui represente un tweet.
+    Contient:
+    - le tweet original
+    - son id
+    - le tweet nettoyé
+    - le sentiment du tweet
+    '''
+
     def __init__(self, id, tweet):
         self.id = id
         self.tweet = tweet
@@ -27,14 +36,3 @@ class Tweet:
             return 5 + degree
         else:
             return 5 - degree
-
-    def __ne__(self, other):
-        return not self.__eq__(other)
-
-    def __hash__(self):
-        return self.tweet.__hash__()
-
-    def __str__(self):
-        return self.tweet
-
-

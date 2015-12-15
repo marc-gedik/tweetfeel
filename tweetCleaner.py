@@ -3,28 +3,37 @@
 
 import string
 import re
-from Tweet import Tweet
+
 import nltk
 from nltk.corpus import stopwords
 
+# Liste des emojis positive
 emoji_pos = ["😄", "😃", "😀", "😊", "☺", "😉", "😍", "😘", "😚", "😗", "😙", "😜", "😝", "😛", "😳", "😁", "😂", "😆",
              "😋", "😎", "😺", "😸", "😻", "😽", "💃", "👏", "👍", "👌", "👊", "👐", "✌", "🌞", "☀", "🔆", "🔅" "💡",
              "🍬", "🍭", "🍯", "🏆", "🐬"]
 
+# Liste des emojis negative
 emoji_neg = ["😔", "😌", "😒", "😞", "😣", "😭", "😪", "😢", "😪", "😥", "😰", "😓", "😩", "😫", "😨", "😱", "😠", "😡",
              "😤", "😖", "😴", "😵", "😲", "😟", "😦", "😧", "😈", "👿", "😮", "😬", "😐", "😕", "😯", "😶", "😇", "😑",
              "💔", "💩", "👎"]
 
+# Liste des emoticones positive
 emoticone_pos = [":-)", ":)", "=)", "(:", "X)", "x)", "(x", "X)", "x)", "(x", ":-P", ":-p", ":P", ":p", "=P", "=p",
                  "X-D", "XD", "x-D", "xD", ":-]", ":]", "=]", ":-d", ":8d", "8-)", "8)", "8-O", "8O", "8D", "=d", "B-)",
                  "B)", "@-)", "<3", ":3", ":-3", "=3", ":-]", ":]", "=]"]
 
+# Liste des emoticones negative
 emoticone_neg = [":-(", ":(", "=(", "):-\|", ":\|", "=\|", "\|:", ":-/", ":/", "=/", "/:", ":'-(", ":'(", "='(" "*-*",
                  "¦~(", "D:", "DX", "D=", ":-@", ":@", ">:-(", ">:(", "=@", ">=("]
 
 
-def formatEmoticone(chaine_emoticone):
-    chaine = "|".join(chaine_emoticone)
+def formatEmoticone(emoticones):
+    '''
+    Fonction qui prend en parametre une liste de string,
+    assemble les elements de la liste avec le character '|'
+    dans une chaine de carateres et la rentvoit
+    '''
+    chaine = "|".join(emoticones)
     chaine = chaine.replace('(', "\\(")
     chaine = chaine.replace(')', "\\)")
     return chaine
@@ -46,6 +55,12 @@ dict = {"en": {"good": "good", "bad": "bad"},
 
 
 def cleanTweet(tweet, lang):
+    '''
+    Fonction qui permet de nettoyer un tweet de toutes les choses specifique à Twitter
+    -> les URL, @User, #mot sont remplacé par URL, AT_USER et le mot du hashtag
+    -> les emoticones sont rempacé par l'humeur lui correspondant
+    '''
+
     # Convert to lower case
     tweet = tweet.lower()
     # Convert www.* or https?://* to URL
@@ -73,6 +88,10 @@ def cleanTweets(tweets, lang):
 
 
 def cleanBanalWords(allTweets, search, lang):
+    '''
+    Enleve dans une phrase les mots qui ne sont pas important
+    '''
+
     if lang == "fr":
         lang = "french"
     else:
@@ -84,7 +103,7 @@ def cleanBanalWords(allTweets, search, lang):
     allTweets = re.sub('rt', '', allTweets)
     allTweets = re.sub('at_user', '', allTweets)
     allTweets = re.sub('url', '', allTweets)
-    allTweets = re.sub(search, '', allTweets)
+    allTweets = re.sub(search.lower(), '', allTweets)
 
     allTweets = ''.join([l for l in allTweets if l not in string.punctuation])
     allTweets = ' '.join([l for l in allTweets.split(" ") if l not in stopwords.words(lang)])
@@ -93,6 +112,10 @@ def cleanBanalWords(allTweets, search, lang):
 
 
 def listFrequenceWord(listAllTweets, search, lang):
+    '''
+    Retourne une liste de frequence d'apparition des mots à partir d'une liste de tweet
+    '''
+
     allTweets = [cleanBanalWords(textTweet.cleaned, search, lang) for textTweet in listAllTweets]
 
     allTweets = " ".join(allTweets)
@@ -101,16 +124,4 @@ def listFrequenceWord(listAllTweets, search, lang):
 
     listFrequence = nltk.FreqDist(allTweets)
 
-    return [Frequency(s, f).serialize() for (s, f) in listFrequence.most_common(listFrequence.N())]
-
-
-class Frequency:
-    def __init__(self, word, frequency):
-        self.word = word
-        self.frequency = frequency
-
-    def serialize(self):
-        return {
-            "text": self.word,
-            "weight": self.frequency
-        }
+    return [{"text": s, "weight": f} for (s, f) in listFrequence.most_common(listFrequence.N())]

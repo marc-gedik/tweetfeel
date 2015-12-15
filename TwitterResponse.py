@@ -1,10 +1,14 @@
 # -*- coding: utf-8 -*-
 
 from bs4 import BeautifulSoup
+
 from Tweet import Tweet
 
 
 class TwitterResponse(object):
+    '''
+    Class qui represente la reponse de twitter au scrapping
+    '''
     def __init__(self):
         self.has_more_items = None
         self.items_html = None
@@ -12,6 +16,10 @@ class TwitterResponse(object):
         self.focused_refresh_interval = None
 
     def getTweets(self):
+        '''
+        Recupere les tweets contenu dans le code html
+        '''
+
         tweets = []
         html = self.items_html.encode('ascii', 'ignore').decode('ascii')
         parsed_html = BeautifulSoup(html, "html.parser")
@@ -23,7 +31,7 @@ class TwitterResponse(object):
                 tweets += [Tweet(id, text)]
         return tweets
 
-def as_person(json):
+def as_response(json):
     response = TwitterResponse()
     response.__dict__.update(json)
     return response

@@ -1,21 +1,14 @@
 # -*- coding: utf-8 -*-
-import json
 from django.http import JsonResponse, HttpResponse
-
 from django.shortcuts import render
-from django.core.serializers import serialize
 
 from sentiment import Sentiment
 import tweetCleaner
 from form import SearchForm
-import tweetsearch
+import tweetSearch
 
 
 # Create your views here.
-def home(request):
-    return render(request, 'analyser/analyser.html')
-
-
 def index(request):
     return render(request, 'analyser/analyser.html')
 
@@ -29,7 +22,7 @@ def analyze(request):
         max = form.cleaned_data['max']
         lang = form.cleaned_data['lang']
 
-        tweets = tweetsearch.scrap(search, min, max, lang)
+        tweets = tweetSearch.scrap(search, min, max, lang)
         tweetCleaner.cleanTweets(tweets, lang)
         wordFrequencies = tweetCleaner.listFrequenceWord(tweets, search, lang)
 
